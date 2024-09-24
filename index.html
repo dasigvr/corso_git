@@ -13,31 +13,37 @@
               Un corso sull'uso di Git VCS [link](https://git-scm.com/book/en/v2).
               ---
               ## Istantanee, non Differenze
-              Molti VCS salvano l'informazione come una lista di modifiche ai file
-              Questi sistemi considerano le informazioni che memorizzano come un insieme di file
+              Molti VCS salvano l'informazione come una lista di modifiche ai file.
+
+              Questi sistemi considerano le informazioni come un insieme di file
+              e memorizzano le modifiche fatte da una revisione all'altra. 
               ---
               ![image](https://git-scm.com/book/en/v2/images/deltas.png)
               ---
-              Git considera i propri dati più come una sequenza di istantanee (snapshot) di un mini filesystem
+              Git considera i propri dati più come una sequenza di istantanee (snapshot) di un mini filesystem.
               ---
               ### Commit
               Con Git ogni volta che salvi lo stato del tuo progetto (commit), salvi un istantanea.
-              Git considera i propri dati più come un *flusso di istantanee*
-              ---
+
+              Git considera i propri dati più come un *flusso di istantanee*.
+              ----
               ![image](https://git-scm.com/book/en/v2/images/snapshots.png)
-              ---
+              ----
               ### Operazioni locali
               Git è un VCS decentralizzato, ovvero non ha bisogno di un server centrale per operare.
+
               La maggior parte delle operazioni avvengono localmente sul tuo PC.
-              ---
+              ----
               ### Integrità
-              Git assicura l'integrità dei dati con dei checksum (tipicamente usando SHA-1)
+              Git assicura l'integrità dei dati con dei checksum (tipicamente usando SHA-1).
+
               Il riferimento ad un file non è basato sul nome del file, ma sull'hash del suo contenuto.
-              ---
+              ----
               ### Puoi solo aggiungere
               Quasi tutte le azioni che puoi fare con Git **aggiungono** dati al suo database.
+
               È molto complesso rimuovere informazioni da Git, ma questo ci assicura contro perdite di dati. 
-              ---
+              ----
               ## Tre stati
               I tre stati principali che può assumere un file in Git sono:
               * modified
@@ -45,31 +51,35 @@
               * committed
 
               Quando si esegue un operazione su un file questa può dipendere dallo stato del file.
-              ---
+              ----
               ![image](https://git-scm.com/book/en/v2/images/areas.png)
               ---
               ## Repository
-              ---
+              ----
               ### Creare un nuovo Repo
               Non è un operazione che si fa spesso, ma va citata.
+
               Dato che un repository è un mini filesystem
               basta posizionarsi su una cartella e scrivere:
               ```bash
               git init
               ```
-              ---
+              ----
               ### Clonare un repository esistente
               Spesso ci capita di voler "scaricare" un repository sul nostro PC.
+
               Questa operazione si chiama **cloning**.
               ```bash
               git clone https://host.com/path/to/repo.git
               ```
-              ---
+              ----
               ### Working tree
               Dopo il cloning di un repository sul nostro PC troviamo una cartella
-              con dei files. Chiameremo questa cartella, le sue sottocartelle e tutti i files
-              **Working tree**
-              ---
+              con dei files.
+              
+              Chiameremo questa cartella, le sue sottocartelle e tutti i files
+              **working tree**
+              ----
               ### Controllare lo stato
               Per controllare lo stato dei tuoi files si usa
               ```bash
@@ -79,78 +89,78 @@
               nothing to commit, working tree clean
               ```
               È buona pratica controllare lo stato del repository prima di ogni operazione.
-              ---
+              ----
               ![image](https://git-scm.com/book/en/v2/images/lifecycle.png)
-              ---
+              ----
               ### Aggiungere un file a Git
               I file che sono presenti nel working tree ma non sono stati aggiungi a Git
-              assumono un quarto stato chiamato **untracked**.
-              Per tracciare il file su git si usa il comando:
-              ```bash
-              git add [files]
-              ```
+              vengono detti **untracked**.
+
+              Per tracciare il file su git si usa il comando 
+              
+              `git add [files]`
+              
               I files transiteranno in stato **staged**
-              ---
+              ----
               ### File modificati
               Quando un file tracciato da Git viene modificato Git se ne accorge e
               fa transitare il file in stato **modified**.
+
               Per confermare la modifica al file si usa il comando
-              ```bash
-              git add [files]
-              ```
+              
+              `git add [files]`
+
               I files torneranno in stato **staged**
-              ---
+              ----
               ### .gitignore
               Se vogliamo mantenere dei files nel nostro working tree che non vanno tracciati in Git
-              ma non vogliamo correre il rischio di tracciarli per sbaglio è possibile popolare il File
-              `.gitignore`
-              ---
+              ma non vogliamo correre il rischio di tracciarli per sbaglio è possibile popolare il file
+              **.gitignore**
+              ----
               ### Consultare modifiche
               Per consultare le modifiche ai files *modified* si usa il comando
-              ```bash
-              git diff
-              ```
-              ---
+              
+              `git diff`
+              ----
               ### Consultare modifiche (2)
               Per consultare le modifiche ai files *staged* si usa il comando
-              ```bash
-              git diff --staged
-              ```
-              ---
+              
+              `git diff --staged`
+              ----
               ### Commit delle modifiche
-              Quando siamo pronti a confermare le modifiche nel database di Git
-              (che vi ricordo è solo additivo) si usa il comando *commit*
-              ```bash
-              git commit
-              ```
+              Quando siamo pronti a confermare le modifiche nel database di Git, che vi ricordo è solo additivo, si usa il comando
+              
+              `git commit`
+
               Git vi chiederà di inserire un messaggio (commit message) per descrivere le modifiche fatte.
-              ---
+              ----
               ### Rimuovere un File (1)
               Se si rimuove un file dal working tree usando le normali funzioni del sistema operativo
-              Git mette quel file in un quinto stato **deleted**.
+              Git mette quel file in stato **deleted**.
 
               È uno stato simile a **modified** e quindi è possibile mettere in *staging area* la cancellazione
-              usando `git add [file]` o annullarla usando `git restore [file]` 
-              ---
+              usando `git add [file]` o annullarla usando `git restore [file]`.
+              ----
               ### Rimuovere un File (2)
               Esiste un comando per rimuovere i file da Git che semplifica il flusso
-              ```bash
-              git rm [file]
-              ```
+              
+              `git rm [file]`
+
               Questo comando rimuove il file dal working tree e lo mette in stato **deleted** ma già
               in *staging area*
-              ---
+              ----
               ### Consultare la storia
               È possibile consultare la storia dei commit del repository usando:
-              ```bash
-              git log
-              ```
+              
+              `git log`
+
               Per ogni commit verrà mostrato l'*autore*, il *commit hash*, il *timestamp* e il *commit message*
               ---
               ## Fare e disfare
-              ---
+              ----
               ### Correggere cose
-              A volte capita di fare un commit e poi accorgersi di aver sbagliato o dimenticato qualcosa
+              A volte capita di fare un commit e poi accorgersi di aver sbagliato o dimenticato qualcosa.
+
               È possibile usare `git commit --amend` in questi casi.
               ----
               Ad esempio è possibile aggiungere un altro file con `git add [file]` e usare `git commit --amend`
@@ -159,60 +169,62 @@
               **Si può correggere solo l'ultimo commit e ha senso farlo solo se il commit non è stato ancora *pushato***
               ----
               È possibile togliere un file aggiunto all'area di staging per sbaglio (non vogliamo ancora committare):
-              ```bash
-              git restore --staged [file]
-              ```
+              
+              `git restore --staged [file]`
               
               *Il contenuto del file non viene modificato*
               ----
               Se abbiamo modificato un file (tracciato) per sbaglio, è possibile scartare le modifiche.
-              ```bash
-              git restore [file]
-              ```
+              
+              `git restore [file]`
               ---
               ## Remotes
-              Git offre molti modi per poter collaborare nel lavoro, uno dei più comuni è l'uso dei *remote repositories*
+              Git offre molti modi per poter collaborare nel lavoro, uno dei più comuni è l'uso dei *remote repositories*.
+
               Nell'esempio di *cloning* qualche slide fa abbiamo visto come scaricare il sorgente da un repository remoto
-              in un working tree locale.
+              in un *working tree* locale.
               ----
               Quando si effettua questa operazione Git aggiunge automaticamente l'url utilizzato nel clone nella lista
               dei *remotes*
               ----
               ### Lista dei remotes
               Per vedere quali remotes abbiamo configurato si esegue il comando
-              ```bash
-              git remote -v
-              ```
               
-              Un *remote* è caratterizzato da un nome e un url
+              `git remote -v`
+              
+              Un *remote* è caratterizzato da un nome e un url.
               ----
               Nonostante sia possibile configurare più remotes in un repository git locale
               nell'uso comune ne viene usato uno solo di nome *origin*.
-              ---
+              ----
               ### Scaricare dati da un remote
-              Per scaricare dati da un remote si usa il comando `git fetch [remote]`
+              Per scaricare dati da un remote si usa il comando `git fetch [remote]`.
+
               Questo comando confronta il tuo repository locale con quello remoto
-              e scarica i dati che mancano
+              e scarica i dati che mancano.
               ----
               Se viene lanciato senza specificare un remote viene usato quello di default
-              che solitamente è *origin*
+              che solitamente è *origin*.
               ----
-              `git fetch` **si occupa solamente di scaricare i dati e non effettua alcuna operazione sul repository (e.g. merge)**
-              ---
+              `git fetch` **si occupa solamente di scaricare i dati e non effettua operazioni di merge**.
+
+              `git pull` è una scorciatoia per fare *fetch+merge* delle modifiche remote.
+              ----
               ### Pubblicare dati verso un remote
               Per fare in modo che i tuoi commit siano visibili nel repository remoto (e quindi scaricabili dai tuoi collaboratori)
-              si usa il comando `git push [remote] [branch]`
-              ```bash
-              git push origin master
-              ```
-              Questo comando trasferisce tutti i commit fatti sul branch master nel suo corrispondente branch remoto
+              si usa il comando
+              
+              `git push origin master`
+
+              Questo comando trasferisce tutti i commit fatti sul branch master nel suo corrispondente branch remoto.
               ----
               Questo comando funziona se:
               * Abbiamo i privilegi di scrittura sul remote
-              * Nessun altro ha fatto altri push nel frattempo
+              * Nessun altro ha fatto push nel frattempo
               ----
               Se il tuo branch non è allineato con quello remoto il push verrà respinto.
-              È necessario fare il *fetch* e *merge* delle modifiche remote
+
+              È necessario fare il *fetch* e *merge* delle modifiche remote.
               ---
               # Git Branching
               ---
@@ -282,7 +294,7 @@
               ----
               ![image](https://git-scm.com/book/en/v2/images/advance-master.png)
               ---
-              # Merging a Branch
+              ## Merging a Branch
               ----
               ## Fast forward merge
               Supponiamo di star lavorando ad una nuova feature nel branch `iss53`
@@ -344,7 +356,7 @@
               ----
               ![image](https://git-scm.com/book/en/v2/images/basic-merging-2.png)
               ----
-              ## Conflitti
+              ### Conflitti
               ----
               Quando ci sono conflitti (e.g. due commit hanno modifiche allo stesso file)
               si genera un conflitto
@@ -364,7 +376,66 @@
 
               La risoluzione dei conflitti non fa parte di questo corso
               ---
-              # Branch remoti
+              ## Branch Remoti
+              ----
+              I branch del tuo repository locale e i branch presenti nel repository remoto
+              sono entità distinte.
+
+              È possibile *collegare* un branch remoto ad un branch locale tramite quelli che
+              vengono chiamati *tracking branch*
+              ----
+              In Git un *tracking branch* è rappresentato da due nomi, il nome del remote e il nome del branch,
+              e.g. 
+              
+              `origin/master`
+              ----
+              Lo stato di `origin/master` nel tuo database Git locale rispecchierà
+              quello dell'ultima comunicazione avuta col server remoto (origin).
+
+              Ecco quello che succede quando si effettua il clone di un repository remoto.
+              ----
+              ![image](https://git-scm.com/book/en/v2/images/remote-branches-1.png)
+              ----
+              Se qualche collega fa *push* di alcune modifiche nello stesso repository otterremo questo
+
+              ![image](https://git-scm.com/book/en/v2/images/remote-branches-2.png)
+              ----
+              Utilizzando il comando `git fetch origin` possiamo sincronizzare il repository
+              locale con quello remoto notando che i branch master si sono disallineati.
+              ----
+              ![image](https://git-scm.com/book/en/v2/images/remote-branches-3.png)
+              ----
+              ### Pushing
+              Per pubblicare un tuo branch locale e renderlo visibile nel repository remoto
+              si usa il comando:
+
+              `git push [remote] [branch]`
+
+              Se eseguiamo `git push` senza argomenti Git userà il remote *origin* e il branch attuale.
+              ----
+              ### Tracking branches
+              Quando facciamo push di un branch locale come fa Git a sapere su che branch remoto
+              dovranno finire le modifiche?
+
+              La risposta a questa domanda sono i *tracking branches* 
+              ----
+              Supponiamo che il nostro branch locale attuale sia `hotfix`, eseguendo il comando:
+
+              `git branch -u origin/hotfix`
+
+              Instruiamo Git ad usare (o creare) il ramo remoto `hotfix` sul remote `origin` quando facciamo push.
+              ---
+              ## Rebasing
+              Git ha due modi per integrare le modifiche di un branch in un altro:
+              
+              * Merge
+              * Rebase
+              ----
+              Supponiamo di avere questa tipica situazione con due branch divergenti:
+              ![image](https://git-scm.com/book/en/v2/images/basic-rebase-1.png)
+              ----
+              Utilizzando *merge* come abbiamo descritto in precedenza otterremo questo risultato:
+              ![image](https://git-scm.com/book/en/v2/images/basic-rebase-2.png)
               ----
               
 
