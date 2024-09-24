@@ -2,7 +2,7 @@
 <html lang="it">
   <head>
     <link rel="stylesheet" href="dist/reveal.css" />
-    <link rel="stylesheet" href="dist/theme/dracula.css" />
+    <link rel="stylesheet" href="dist/theme/beige.css" />
   </head>
   <body>
     <div class="reveal">
@@ -32,7 +32,7 @@
               ---
               ### Integrità
               Git assicura l'integrità dei dati con dei checksum (tipicamente usando SHA-1)
-              Il riferimento ad un file non è basato sul nome del file, ma sull’hash del suo contenuto.
+              Il riferimento ad un file non è basato sul nome del file, ma sull'hash del suo contenuto.
               ---
               ### Puoi solo aggiungere
               Quasi tutte le azioni che puoi fare con Git **aggiungono** dati al suo database.
@@ -213,11 +213,163 @@
               ----
               Se il tuo branch non è allineato con quello remoto il push verrà respinto.
               È necessario fare il *fetch* e *merge* delle modifiche remote
-            
+              ---
+              # Git Branching
+              ---
+              ## Cosa è un commit ?
+              Cosa succede quando faccio questo:
+              ```bash
+              git add README test.rb LICENSE
+              git commit -m 'Initial commit'
+              ```
+              ----
+              ![image](https://git-scm.com/book/en/v2/images/commit-and-tree.png)
+              ----              
+              Il commit contiene:
+              * Un puntatore al `tree`, ovvero alla lista di contenuti
+              * Metadata (autore, data, messaggio, etc...)
+              ----
+              ![image](https://git-scm.com/book/en/v2/images/commits-and-parents.png)
+              ---
+              ## Cosa è un branch ?
+              In Git un branch è un puntatore ad un commit.
+              ----
+              Usando il comando `git switch` è possibile decidere il branch "attuale"
+              e quindi il contenuto del working tree
+              ----
+              Quando facciamo `git commit` il branch "attuale" si sposta automaticamente
+              al nostro ultimo commit
+              ----
+              ![image](https://git-scm.com/book/en/v2/images/branch-and-history.png)
+              ----
+              ### Creare un nuovo branch
+              Si può creare un nuovo branch usando il comando `git branch [nuovo_branch]`
+              
+              e.g. `git branch testing`
+              creerà un nuovo puntatore che punta allo stesso commit di quello attuale.
+              ----
+              ![image](https://git-scm.com/book/en/v2/images/two-branches.png)
+              ----
+              ## Cosa è HEAD ?
+              Quando parlo di commit "attuale" parlo di `HEAD`
+
+              È un puntatore speciale che Git gestisce e che punta sempre al commit, o al branch
+              che rappresenta il working tree
+              ----
+              ![image](https://git-scm.com/book/en/v2/images/head-to-master.png)
+              ----
+              Usando `git switch testing` possiamo cambiare branch di lavoro a `testing`
+
+              Quello che accade è che `HEAD` si sposta
+              ----
+              ![image](https://git-scm.com/book/en/v2/images/head-to-testing.png)
+              ----
+              Se adesso facciamo un nuovo commit, avanzeremo il branch `testing`
+              ```bash
+              git commit -m 'Make a change'
+              ```
+              ----
+              ![image](https://git-scm.com/book/en/v2/images/advance-testing.png)
+              ----
+              Adesso possiamo tornare su `master` scrivendo `git switch master`
+
+              **Il contenuto della working directory viene modificato quando si fa `switch`**
+              ----
+              ![image](https://git-scm.com/book/en/v2/images/checkout-master.png)
+              ----
+              Se adesso facciamo un altro commit otteniamo questo risultato e si dice
+              che il branch `testing` e il branch `master` sono ora *divergenti*.
+              ----
+              ![image](https://git-scm.com/book/en/v2/images/advance-master.png)
+              ---
+              # Merging a Branch
+              ----
+              ## Fast forward merge
+              Supponiamo di star lavorando ad una nuova feature nel branch `iss53`
+              ma ci viene richiesto di fare un hotfix dal ramo `master`
+              ----
+              ![image](https://git-scm.com/book/en/v2/images/basic-branching-4.png)
+              ----
+              Adesso dobbiamo fare il merge del ramo `hotfix` nel ramo `master`
+
+              Possiamo notare come ci sia un percorso diretto tra il ramo `hotfix` e il ramo `master`
+
+              Questo genere di merge viene chiamato `fast-forward`
+              ----
+              ```bash
+              $ git switch master
+              $ git merge hotfix
+              Updating f42c576..3a0874c
+              Fast-forward
+               index.html | 2 ++
+               1 file changed, 2 insertions(+)
+              ```
+              ----
+              Nei merge `fast-forward` Git semplicemente sposta il puntatore del branch 
+              di destinazione in avanti fino al branch di arrivo
+              ----
+              ![image](https://git-scm.com/book/en/v2/images/basic-branching-5.png)
+              ----
+              A questo punto *è sicuro* eliminare il branch `hotfix` che non ci servirà più
+              con `git branch -d hotfix`
+              e riprendere il lavoro su `iss53` con `git switch iss53`
+              ----
+              ![image](https://git-scm.com/book/en/v2/images/basic-branching-6.png)
+              ----
+              **È importante notare come l'hotfix non sia presente nel ramo `iis53`!*
+              ----
+              ## Merge commit
+              Supponiamo che il lavoro su `iss53` sia finito, adesso dobbiamo fare il merge
+              su `master`
+              ----
+              ```bash
+              $ git switch master
+              Switched to branch 'master'
+              $ git merge iss53
+              Merge made by the 'recursive' strategy.
+              index.html |    1 +
+              1 file changed, 1 insertion(+)              
+              ```
+              ----
+              Dato che la storia era *divergente* Git non può procedere con un semplice
+              `fast-forward`
+
+              In questo caso Git opererà creando un nuovo
+              commit basandosi sul primo antenato in comune
+              ----
+              ![image](https://git-scm.com/book/en/v2/images/basic-merging-1.png)
+              ----
+              Il nuovo commit è anche detto *merge commit* ed è speciale perché ha 
+              più di un *parent commit*
+              ----
+              ![image](https://git-scm.com/book/en/v2/images/basic-merging-2.png)
+              ----
+              ## Conflitti
+              ----
+              Quando ci sono conflitti (e.g. due commit hanno modifiche allo stesso file)
+              si genera un conflitto
+
+              Git usa degli algoritmi per risolvere il conflitto
+              in modo automatico, ma a volte non riesce
+              ----
+              ```bash
+              $ git merge iss53
+              Auto-merging index.html
+              CONFLICT (content): Merge conflict in index.html
+              Automatic merge failed; fix conflicts and then commit the result.
+              ```
+              ----
+              In questo caso il *merge commit* non è ancora stato creato
+              Git è in attesa che il conflitto venga risolto e committato
+
+              La risoluzione dei conflitti non fa parte di questo corso
+              ---
+              # Branch remoti
+              ----
+              
 
             </textarea>
           </section>
-        <section>Slide 2</section>
       </div>
     </div>
     
