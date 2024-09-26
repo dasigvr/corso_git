@@ -437,8 +437,40 @@
               Utilizzando *merge* come abbiamo descritto in precedenza otterremo questo risultato:
               ![image](https://git-scm.com/book/en/v2/images/basic-rebase-2.png)
               ----
-              
+              Possiamo ottenere un risultato migliore utilizzando `git rebase` prima di effettuare il merge.
 
+              ```bash
+              git switch experiment
+              git rebase master
+              ```
+              ----
+              Questi comandi "riavvolgeranno" i commit del branch `experiment` e li "risvolgeranno"
+              a partire dal branch `master` ottenendo questa situazione:
+              ----
+              ![image](https://git-scm.com/book/en/v2/images/basic-rebase-3.png)
+              ----
+              A questo punto ci siamo messi in una condizione dove il merge di `experimental` su `master`
+              è un semplice *fast forward*.
+              ----
+              ![image](https://git-scm.com/book/en/v2/images/basic-rebase-4.png)
+              ----
+              Rebase è un operazione speciale perché è una delle poche che non va in addizione,
+              ma va a "modificare" la storia del repository.
+
+              La regola *fondamentale* del Rebase per non essere odiati è:
+
+              **Mai usare rebase su commit che esistono fuori dal tuo repository (e.g. pushati sul remote)
+              e su cui altri potrebbero aver basato il loro lavoro**
+              ---
+              ## Git è tanto altro
+
+              https://git-scm.com/book/en/v2
+
+              ---
+              # Grazie
+              
+              > ⸺  <cite>Daniele Simonetti © 2024</cite>
+ 
             </textarea>
           </section>
       </div>
