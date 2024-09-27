@@ -1,14 +1,24 @@
 <!DOCTYPE html>
 <html lang="it">
-  <head>
-    <link rel="stylesheet" href="dist/reveal.css" />
-    <link rel="stylesheet" href="dist/theme/beige.css" />
-  </head>
-  <body>
-    <div class="reveal">
-      <div class="slides">
-        <section data-separator-vertical="----" data-markdown>
-            <textarea data-template>
+
+<head>
+  <link rel="stylesheet" href="dist/reveal.css" />
+  <link rel="stylesheet" href="dist/theme/solarized.css" />
+  <link rel="stylesheet" href="plugin/highlight/zenburn.css" />
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <ul>
+          <li><a href="#/core-concepts">Concetti di base</a></li>
+          <li><a href="#/branching">Branching e Merging</a></li>
+          <li><a href="#/flows">Flussi, Concetti avanzati</a></li>
+        </ul>
+      </section>
+      <section id="core-concepts" data-separator-vertical="----" data-markdown>
+        <textarea data-template>
               # Git
               Un corso sull'uso di Git VCS [link](https://git-scm.com/book/en/v2).
               ---
@@ -61,7 +71,7 @@
 
               Dato che un repository è un mini filesystem
               basta posizionarsi su una cartella e scrivere:
-              ```bash
+              ```
               git init
               ```
               ----
@@ -69,7 +79,7 @@
               Spesso ci capita di voler "scaricare" un repository sul nostro PC.
 
               Questa operazione si chiama **cloning**.
-              ```bash
+              ```
               git clone https://host.com/path/to/repo.git
               ```
               ----
@@ -82,7 +92,7 @@
               ----
               ### Controllare lo stato
               Per controllare lo stato dei tuoi files si usa
-              ```bash
+              ```
               $ git status
               On branch master
               Your branch is up-to-date with 'origin/master'.
@@ -226,268 +236,545 @@
 
               È necessario fare il *fetch* e *merge* delle modifiche remote.
               ---
-              # Git Branching
-              ---
-              ## Cosa è un commit ?
-              Cosa succede quando faccio questo:
-              ```bash
-              git add README test.rb LICENSE
-              git commit -m 'Initial commit'
+              ## Tagging
+              Come altri VCS Git da la possibilità di etichettare specifici punti nella storia di un repository.
+              ----
+              Si può usare il comando `git tag` per listare i tag esistenti.
+
+              Git supporta due tipi di tags: Lightweight e Annotated.
+              ----
+              ### Lightweight tags
+              I Lightweight tags sono trattati esattemente come un branch, ma in sola lettura.
+
+              Un semplice puntatore ad uno specifico commit.
+
+              Per creare un lightweight tag (al commit corrente) si usa il comando `git tag [nometag]`.
+              ----
+              ### Annotated tags
+              Gli annotated tags invece sono oggetti di prim'ordine memorizzati nel database di Git.
+
+              - Hanno un loro checksum
+              - Hanno dei metadati (autore del tag, data, tag message)
+              - Possono essere firmati GPG
+              ----
+              Per creare un annotated tag (al commit corrente) si usa il comando:
+              ```
+              git tag -a [nometag] -m "the tag message"
               ```
               ----
-              ![image](https://git-scm.com/book/en/v2/images/commit-and-tree.png)
-              ----              
-              Il commit contiene:
-              * Un puntatore al `tree`, ovvero alla lista di contenuti
-              * Metadata (autore, data, messaggio, etc...)
-              ----
-              ![image](https://git-scm.com/book/en/v2/images/commits-and-parents.png)
-              ---
-              ## Cosa è un branch ?
-              In Git un branch è un puntatore ad un commit.
-              ----
-              Usando il comando `git switch` è possibile decidere il branch "attuale"
-              e quindi il contenuto del working tree
-              ----
-              Quando facciamo `git commit` il branch "attuale" si sposta automaticamente
-              al nostro ultimo commit
-              ----
-              ![image](https://git-scm.com/book/en/v2/images/branch-and-history.png)
-              ----
-              ### Creare un nuovo branch
-              Si può creare un nuovo branch usando il comando `git branch [nuovo_branch]`
+              ### Pubblicare un tag
+              Di default il comando `git push` non trasferisce i tag locali al remote.
               
-              e.g. `git branch testing`
-              creerà un nuovo puntatore che punta allo stesso commit di quello attuale.
-              ----
-              ![image](https://git-scm.com/book/en/v2/images/two-branches.png)
-              ----
-              ## Cosa è HEAD ?
-              Quando parlo di commit "attuale" parlo di `HEAD`
-
-              È un puntatore speciale che Git gestisce e che punta sempre al commit, o al branch
-              che rappresenta il working tree
-              ----
-              ![image](https://git-scm.com/book/en/v2/images/head-to-master.png)
-              ----
-              Usando `git switch testing` possiamo cambiare branch di lavoro a `testing`
-
-              Quello che accade è che `HEAD` si sposta
-              ----
-              ![image](https://git-scm.com/book/en/v2/images/head-to-testing.png)
-              ----
-              Se adesso facciamo un nuovo commit, avanzeremo il branch `testing`
-              ```bash
-              git commit -m 'Make a change'
-              ```
-              ----
-              ![image](https://git-scm.com/book/en/v2/images/advance-testing.png)
-              ----
-              Adesso possiamo tornare su `master` scrivendo `git switch master`
-
-              **Il contenuto della working directory viene modificato quando si fa `switch`**
-              ----
-              ![image](https://git-scm.com/book/en/v2/images/checkout-master.png)
-              ----
-              Se adesso facciamo un altro commit otteniamo questo risultato e si dice
-              che il branch `testing` e il branch `master` sono ora *divergenti*.
-              ----
-              ![image](https://git-scm.com/book/en/v2/images/advance-master.png)
-              ---
-              ## Merging a Branch
-              ----
-              ## Fast forward merge
-              Supponiamo di star lavorando ad una nuova feature nel branch `iss53`
-              ma ci viene richiesto di fare un hotfix dal ramo `master`
-              ----
-              ![image](https://git-scm.com/book/en/v2/images/basic-branching-4.png)
-              ----
-              Adesso dobbiamo fare il merge del ramo `hotfix` nel ramo `master`
-
-              Possiamo notare come ci sia un percorso diretto tra il ramo `hotfix` e il ramo `master`
-
-              Questo genere di merge viene chiamato `fast-forward`
-              ----
-              ```bash
-              $ git switch master
-              $ git merge hotfix
-              Updating f42c576..3a0874c
-              Fast-forward
-               index.html | 2 ++
-               1 file changed, 2 insertions(+)
-              ```
-              ----
-              Nei merge `fast-forward` Git semplicemente sposta il puntatore del branch 
-              di destinazione in avanti fino al branch di arrivo
-              ----
-              ![image](https://git-scm.com/book/en/v2/images/basic-branching-5.png)
-              ----
-              A questo punto *è sicuro* eliminare il branch `hotfix` che non ci servirà più
-              con `git branch -d hotfix`
-              e riprendere il lavoro su `iss53` con `git switch iss53`
-              ----
-              ![image](https://git-scm.com/book/en/v2/images/basic-branching-6.png)
-              ----
-              **È importante notare come l'hotfix non sia presente nel ramo `iis53`!*
-              ----
-              ## Merge commit
-              Supponiamo che il lavoro su `iss53` sia finito, adesso dobbiamo fare il merge
-              su `master`
-              ----
-              ```bash
-              $ git switch master
-              Switched to branch 'master'
-              $ git merge iss53
-              Merge made by the 'recursive' strategy.
-              index.html |    1 +
-              1 file changed, 1 insertion(+)              
-              ```
-              ----
-              Dato che la storia era *divergente* Git non può procedere con un semplice
-              `fast-forward`
-
-              In questo caso Git opererà creando un nuovo
-              commit basandosi sul primo antenato in comune
-              ----
-              ![image](https://git-scm.com/book/en/v2/images/basic-merging-1.png)
-              ----
-              Il nuovo commit è anche detto *merge commit* ed è speciale perché ha 
-              più di un *parent commit*
-              ----
-              ![image](https://git-scm.com/book/en/v2/images/basic-merging-2.png)
-              ----
-              ### Conflitti
-              ----
-              Quando ci sono conflitti (e.g. due commit hanno modifiche allo stesso file)
-              si genera un conflitto
-
-              Git usa degli algoritmi per risolvere il conflitto
-              in modo automatico, ma a volte non riesce
-              ----
-              ```bash
-              $ git merge iss53
-              Auto-merging index.html
-              CONFLICT (content): Merge conflict in index.html
-              Automatic merge failed; fix conflicts and then commit the result.
-              ```
-              ----
-              In questo caso il *merge commit* non è ancora stato creato
-              Git è in attesa che il conflitto venga risolto e committato
-
-              La risoluzione dei conflitti non fa parte di questo corso
-              ---
-              ## Branch Remoti
-              ----
-              I branch del tuo repository locale e i branch presenti nel repository remoto
-              sono entità distinte.
-
-              È possibile *collegare* un branch remoto ad un branch locale tramite quelli che
-              vengono chiamati *tracking branch*
-              ----
-              In Git un *tracking branch* è rappresentato da due nomi, il nome del remote e il nome del branch,
-              e.g. 
+              Per pubblicare un singolo tag si usa il comando 
               
-              `origin/master`
-              ----
-              Lo stato di `origin/master` nel tuo database Git locale rispecchierà
-              quello dell'ultima comunicazione avuta col server remoto (origin).
+              `git push [remote] [nometag]`.
 
-              Ecco quello che succede quando si effettua il clone di un repository remoto.
-              ----
-              ![image](https://git-scm.com/book/en/v2/images/remote-branches-1.png)
-              ----
-              Se qualche collega fa *push* di alcune modifiche nello stesso repository otterremo questo
-
-              ![image](https://git-scm.com/book/en/v2/images/remote-branches-2.png)
-              ----
-              Utilizzando il comando `git fetch origin` possiamo sincronizzare il repository
-              locale con quello remoto notando che i branch master si sono disallineati.
-              ----
-              ![image](https://git-scm.com/book/en/v2/images/remote-branches-3.png)
-              ----
-              ### Pushing
-              Per pubblicare un tuo branch locale e renderlo visibile nel repository remoto
-              si usa il comando:
-
-              `git push [remote] [branch]`
-
-              Se eseguiamo `git push` senza argomenti Git userà il remote *origin* e il branch attuale.
-              ----
-              ### Tracking branches
-              Quando facciamo push di un branch locale come fa Git a sapere su che branch remoto
-              dovranno finire le modifiche?
-
-              La risposta a questa domanda sono i *tracking branches* 
-              ----
-              Supponiamo che il nostro branch locale attuale sia `hotfix`, eseguendo il comando:
-
-              `git branch -u origin/hotfix`
-
-              Instruiamo Git ad usare (o creare) il ramo remoto `hotfix` sul remote `origin` quando facciamo push.
-              ---
-              ## Rebasing
-              Git ha due modi per integrare le modifiche di un branch in un altro:
+              Per pubblicare tutti i tags si usa 
               
-              * Merge
-              * Rebase
-              ----
-              Supponiamo di avere questa tipica situazione con due branch divergenti:
-              ![image](https://git-scm.com/book/en/v2/images/basic-rebase-1.png)
-              ----
-              Utilizzando *merge* come abbiamo descritto in precedenza otterremo questo risultato:
-              ![image](https://git-scm.com/book/en/v2/images/basic-rebase-2.png)
-              ----
-              Possiamo ottenere un risultato migliore utilizzando `git rebase` prima di effettuare il merge.
-
-              ```bash
-              git switch experiment
-              git rebase master
-              ```
-              ----
-              Questi comandi "riavvolgeranno" i commit del branch `experiment` e li "risvolgeranno"
-              a partire dal branch `master` ottenendo questa situazione:
-              ----
-              ![image](https://git-scm.com/book/en/v2/images/basic-rebase-3.png)
-              ----
-              A questo punto ci siamo messi in una condizione dove il merge di `experimental` su `master`
-              è un semplice *fast forward*.
-              ----
-              ![image](https://git-scm.com/book/en/v2/images/basic-rebase-4.png)
-              ----
-              Rebase è un operazione speciale perché è una delle poche che non va in addizione,
-              ma va a "modificare" la storia del repository.
-
-              La regola *fondamentale* del Rebase per non essere odiati è:
-
-              **Mai usare rebase su commit che esistono fuori dal tuo repository (e.g. pushati sul remote)
-              e su cui altri potrebbero aver basato il loro lavoro**
+              `git push [remote] --tags`.
               ---
               ## Git è tanto altro
 
               https://git-scm.com/book/en/v2
-
-              ---
-              # Grazie
-              
-              > ⸺  <cite>Daniele Simonetti © 2024</cite>
- 
-            </textarea>
-          </section>
-      </div>
-    </div>
     
-    <script src="plugin/markdown/markdown.js"></script>
-    <script src="dist/reveal.js"></script>
-    <script>
-        Reveal.initialize({
-            plugins: [RevealMarkdown],
-            slideNumber: true,
-            progress: true,
-            jumpToSlide: true,
-            hash: true,
-            overview: true,
+              ---
+              # Q&A
+              
+              > ⸺  <cite>Daniele Simonetti © 2024</cite>              
+            </textarea>
+      </section>
 
-        });
-    </script>
-  </body>
+      <section id="branching" data-separator-vertical="----" data-markdown>
+        <textarea data-template>
+          # Git Branching
+          ---
+          ## Cosa è un commit ?
+          Cosa succede quando faccio questo:
+          ```
+          git add README test.rb LICENSE
+          git commit -m 'Initial commit'
+          ```
+          ----
+          ![image](https://git-scm.com/book/en/v2/images/commit-and-tree.png)
+          ----              
+          Il commit contiene:
+          * Un puntatore al `tree`, ovvero alla lista di contenuti
+          * Metadata (autore, data, messaggio, etc...)
+          ----
+          ![image](https://git-scm.com/book/en/v2/images/commits-and-parents.png)
+          ---
+          ## Cosa è un branch ?
+          In Git un branch è un puntatore ad un commit.
+          ----
+          Usando il comando `git switch` è possibile decidere il branch "attuale"
+          e quindi il contenuto del working tree
+          ----
+          Quando facciamo `git commit` il branch "attuale" si sposta automaticamente
+          al nostro ultimo commit
+          ----
+          ![image](https://git-scm.com/book/en/v2/images/branch-and-history.png)
+          ----
+          ### Creare un nuovo branch
+          Si può creare un nuovo branch usando il comando 
+          
+          `git branch [nuovo_branch]`
+          
+          e.g. `git branch testing`
+          creerà un nuovo puntatore che punta allo stesso commit di quello attuale.
+          ----
+          ![image](https://git-scm.com/book/en/v2/images/two-branches.png)
+          ----
+          ## Cosa è HEAD ?
+          Quando parlo di commit "attuale" parlo di `HEAD`
+
+          È un puntatore speciale che Git gestisce e che punta sempre al commit, o al branch
+          che rappresenta il working tree
+          ----
+          ![image](https://git-scm.com/book/en/v2/images/head-to-master.png)
+          ----
+          Usando `git switch testing` possiamo cambiare branch di lavoro a `testing`
+
+          Quello che accade è che `HEAD` si sposta
+          ----
+          ![image](https://git-scm.com/book/en/v2/images/head-to-testing.png)
+          ----
+          Se adesso facciamo un nuovo commit, avanzeremo il branch `testing`
+          ```
+          git commit -m 'Make a change'
+          ```
+          ----
+          ![image](https://git-scm.com/book/en/v2/images/advance-testing.png)
+          ----
+          Adesso possiamo tornare su `master` scrivendo `git switch master`
+
+          **Il contenuto della working directory viene modificato quando si fa `switch`**
+          ----
+          ![image](https://git-scm.com/book/en/v2/images/checkout-master.png)
+          ----
+          Se adesso facciamo un altro commit otteniamo questo risultato e si dice
+          che il branch `testing` e il branch `master` sono ora *divergenti*.
+          ----
+          ![image](https://git-scm.com/book/en/v2/images/advance-master.png)
+          ---
+          ## Merging a Branch
+          ----
+          ## Fast forward merge
+          Supponiamo di star lavorando ad una nuova feature nel branch `iss53`
+          ma ci viene richiesto di fare un hotfix dal ramo `master`
+          ----
+          ![image](https://git-scm.com/book/en/v2/images/basic-branching-4.png)
+          ----
+          Adesso dobbiamo fare il merge del ramo `hotfix` nel ramo `master`
+
+          Possiamo notare come ci sia un percorso diretto tra il ramo `hotfix` e il ramo `master`
+
+          Questo genere di merge viene chiamato `fast-forward`
+          ----
+          ```
+          $ git switch master
+          $ git merge hotfix
+          Updating f42c576..3a0874c
+          Fast-forward
+           index.html | 2 ++
+           1 file changed, 2 insertions(+)
+          ```
+          ----
+          Nei merge `fast-forward` Git semplicemente sposta il puntatore del branch 
+          di destinazione in avanti fino al branch di arrivo
+          ----
+          ![image](https://git-scm.com/book/en/v2/images/basic-branching-5.png)
+          ----
+          A questo punto *è sicuro* eliminare il branch `hotfix` che non ci servirà più
+          con `git branch -d hotfix`
+          e riprendere il lavoro su `iss53` con `git switch iss53`
+          ----
+          ![image](https://git-scm.com/book/en/v2/images/basic-branching-6.png)
+          ----
+          **È importante notare come l'hotfix non sia presente nel ramo `iis53`!*
+          ----
+          ## Merge commit
+          Supponiamo che il lavoro su `iss53` sia finito, adesso dobbiamo fare il merge
+          su `master`
+          ----
+          ```
+          $ git switch master
+          Switched to branch 'master'
+          $ git merge iss53
+          Merge made by the 'recursive' strategy.
+          index.html |    1 +
+          1 file changed, 1 insertion(+)              
+          ```
+          ----
+          Dato che la storia era *divergente* Git non può procedere con un semplice
+          `fast-forward`
+
+          In questo caso Git opererà creando un nuovo
+          commit basandosi sul primo antenato in comune
+          ----
+          ![image](https://git-scm.com/book/en/v2/images/basic-merging-1.png)
+          ----
+          Il nuovo commit è anche detto *merge commit* ed è speciale perché ha 
+          più di un *parent commit*
+          ----
+          ![image](https://git-scm.com/book/en/v2/images/basic-merging-2.png)
+          ----
+          ### Conflitti
+          ----
+          Quando ci sono conflitti (e.g. due commit hanno modifiche allo stesso file)
+          si genera un conflitto
+
+          Git usa degli algoritmi per risolvere il conflitto
+          in modo automatico, ma a volte non riesce
+          ----
+          ```
+          $ git merge iss53
+          Auto-merging index.html
+          CONFLICT (content): Merge conflict in index.html
+          Automatic merge failed; fix conflicts and then commit the result.
+          ```
+          ----
+          In questo caso il *merge commit* non è ancora stato creato
+          Git è in attesa che il conflitto venga risolto e committato
+
+          La risoluzione dei conflitti non fa parte di questo corso.
+          ---
+          ## Branch Remoti
+          ----
+          I branch del tuo repository locale e i branch presenti nel repository remoto
+          sono entità distinte.
+
+          È possibile *collegare* un branch remoto ad un branch locale tramite quelli che
+          vengono chiamati *tracking branch*
+          ----
+          In Git un *tracking branch* è rappresentato da due nomi, il nome del remote e il nome del branch,
+          e.g. 
+          
+          `origin/master`
+          ----
+          Lo stato di `origin/master` nel tuo database Git locale rispecchierà
+          quello dell'ultima comunicazione avuta col server remoto (origin).
+
+          Ecco quello che succede quando si effettua il clone di un repository remoto.
+          ----
+          ![image](https://git-scm.com/book/en/v2/images/remote-branches-1.png)
+          ----
+          Se qualche collega fa *push* di alcune modifiche nello stesso repository otterremo questo
+
+          ![image](https://git-scm.com/book/en/v2/images/remote-branches-2.png)
+          ----
+          Utilizzando il comando `git fetch origin` possiamo sincronizzare il repository
+          locale con quello remoto notando che i branch master si sono disallineati.
+          ----
+          ![image](https://git-scm.com/book/en/v2/images/remote-branches-3.png)
+          ----
+          ### Pushing
+          Per pubblicare un tuo branch locale e renderlo visibile nel repository remoto
+          si usa il comando:
+
+          `git push [remote] [branch]`
+
+          Se eseguiamo `git push` senza argomenti Git userà il remote *origin* e il branch attuale.
+          ----
+          ### Tracking branches
+          Quando facciamo push di un branch locale come fa Git a sapere su che branch remoto
+          dovranno finire le modifiche?
+
+          La risposta a questa domanda sono i *tracking branches* 
+          ----
+          Supponiamo che il nostro branch locale attuale sia `hotfix`, eseguendo il comando:
+
+          `git branch -u origin/hotfix`
+
+          Instruiamo Git ad usare (o creare) il ramo remoto `hotfix` sul remote `origin` quando facciamo push.
+          ---
+          ## Rebasing
+          Git ha due modi per integrare le modifiche di un branch in un altro:
+          
+          * Merge
+          * Rebase
+          ----
+          Supponiamo di avere questa tipica situazione con due branch divergenti:
+          ![image](https://git-scm.com/book/en/v2/images/basic-rebase-1.png)
+          ----
+          Utilizzando *merge* come abbiamo descritto in precedenza otterremo questo risultato:
+          ![image](https://git-scm.com/book/en/v2/images/basic-rebase-2.png)
+          ----
+          Possiamo ottenere un risultato migliore utilizzando `git rebase` prima di effettuare il merge.
+
+          ```bash
+          git switch experiment
+          git rebase master
+          ```
+          ----
+          Questi comandi "riavvolgeranno" i commit del branch `experiment` e li "risvolgeranno"
+          a partire dal branch `master` ottenendo questa situazione:
+          ----
+          ![image](https://git-scm.com/book/en/v2/images/basic-rebase-3.png)
+          ----
+          A questo punto ci siamo messi in una condizione dove il merge di `experimental` su `master`
+          è un semplice *fast forward*.
+          ----
+          ![image](https://git-scm.com/book/en/v2/images/basic-rebase-4.png)
+          ----
+          Rebase è un operazione speciale perché è una delle poche che non va in addizione,
+          ma va a "modificare" la storia del repository.
+
+          La regola *fondamentale* del Rebase per non essere odiati è:
+
+          **Mai usare rebase su commit che esistono fuori dal tuo repository (e.g. pushati sul remote)
+          e su cui altri potrebbero aver basato il loro lavoro**
+          ---
+          ## Git è tanto altro
+
+          https://git-scm.com/book/en/v2
+
+          ---
+          # Q&A
+          
+          > ⸺  <cite>Daniele Simonetti © 2024</cite>
+          </textarea>
+      </section>
+
+      <section id="flows" data-separator-vertical="----" data-markdown>
+        <textarea data-template>
+          # Concetti avanzati
+          ---
+          ## Comandi utili
+          ```
+          git log --abbrev-commit --pretty=oneline
+          ```
+          ----
+          ```
+          git log --pretty=format:'%h %s' --graph
+          ```
+          ---
+          ## Stashing
+          Può capitare che, a metà di un lavoro, sopraggiunga un urgenza.
+          ----
+          Se devi cambiare branch per lavorare su un altro progetto, ma il tuo working tree è sporco hai due opzioni:
+          - Fare commit del tuo lavoro incompleto
+          - Usare `git stash`
+          ----
+          Fare commit di un lavoro incompleto spesso non è una buona idea: 
+          
+          - Potrebbe essere codice che ancora non compila
+          - Potrebbe contenere dati di test o dati sensibili hard-coded
+          - Ci vuole del tempo per pensare ad un commit message adeguato e magari non ce l'hai
+          ----
+          `git stash` permette di memorizzare il tuo lavoro incompleto e di ripulire il tuo working tree.
+          ----
+          ```
+          $ git stash
+          Saved working directory and index state \
+            "WIP on master: 049d078 Create index file"
+          HEAD is now at 049d078 Create index file
+          (To restore them type "git stash apply")          
+          ```
+          ----
+          ```
+          git stash list
+          ```
+
+          Permette di elencare gli stash accumulati.
+          ----
+          ```
+          git stash apply
+          ```
+
+          Permette di applicare lo stash più recente **al branch attuale**
+          ----
+          Con `git stash` puoi salvare del lavoro incompleto da un branch
+          e applicarlo su un altro.
+
+          `git stash` non interferisce in alcun modo con i tuoi commit.
+          ----
+          * `git stash apply` => applica lo stash più recente
+          * `git stash drop` => elimina lo stash più recente
+          * `git stash pop` => applica lo stash più recente e lo elimina
+          ---
+          ## Cleaning
+          Git tiene traccia di tutti i files importanti per il tuo progetto.
+
+          Questo significa anche che è in grado di eliminare tutti i files che non sono importanti.
+          ----
+          Spesso quando vogliamo un working tree pristino scegliamo l'opzione di clonarlo nuovamente
+          dal repository remoto.
+
+          Questo però significa che non avrò le miei modifiche locali, non ancora pushate.
+          ----
+          `git clean` permette di cancellare i files non tracciati da Git dal working tree.
+
+          *Questo comando cancella dei files in modo non recuperabile, quindi va usato con cautela*
+          ----
+          ```
+          $ git clean -d -n
+            Would remove test.o
+            Would remove tmp/
+          ```
+
+          L'opzione `-n` permette di valutare quali files verranno eliminati senza effettivamente eliminarli.
+          ----
+          ```
+          git clean -f -d
+          ```
+          Elimina tutti i files non tracciati e tutte le cartelle che rimangono vuote a causa della cancellazione.
+          ----
+          Di default non cancella i files che sono ignorati da `.gitignore`.
+
+          Se vuoi cancellare anche quei files (e.g. per eliminare i files intermedi di una compilata) si usa lo switch `-x`
+
+          ```
+          $ git clean -n -d -x
+          Would remove build.TMP
+          Would remove test.o
+          Would remove tmp/
+          ```
+          ---
+          ## Strategie di branching
+          Git è uno strumento molto potente ma non imbriglia nessun tipo di flusso di lavoro.          
+
+          La scelta del flusso è demandata agli utilizzatori.
+
+          Vi presenterò alcuni dei flussi più usati nella community.
+          ---
+          ### Gitflow
+
+          Gitflow è uno dei primi flussi di lavoro ritenuti "efficaci" che fa la prima
+          comparsa nel Gennaio 2010.
+
+          [a-successful-git-branching-model](https://nvie.com/posts/a-successful-git-branching-model/)
+
+          ----
+
+          Le colonne portanti di questo flusso di lavoro sono due **long living branch**:
+
+          - master
+          - develop
+
+          ----
+
+          Frutta poi una serie di **topic branches** per accomodare vari modelli di business:
+
+          - feature branches => nuove feature
+          - release branches => manutenzione campo
+          - hotfixex
+          
+          ----
+
+          Nonostante questo flusso sia tutt'oggi uno dei più utilizzati nel mondo, l'autore ci ricorda
+          che quando ha pensato questo flusso non esisteva ancora il concetto di *continuous delivery*.
+          
+          Questo flusso è comunque il più indicato per gestire un prodotto che è **esplicitamente versionato**
+          o che richede supporto per **molteplici versioni in campo**.
+
+          ----
+
+          <img src="https://blog.jetbrains.com/wp-content/uploads/2023/05/git-flow.png" style="height:680px"/>
+          
+          ---
+
+          ## Github flow
+
+          Il Github flow, manco a dirlo, introdotto da Github, è un flusso di lavoro moderno basato su Git.
+
+          [docs.github.com/github-flow](https://docs.github.com/en/get-started/using-github/github-flow)
+
+          ----
+
+          Questo flusso implementa i seguenti concetti:
+
+          - Il branch `main` contiene solo il codice di produzione
+          - Lo sviluppo è fatto in **feature branches** da integrare nel ramo `main`
+          - Si usano Pull Request per fare code review e discutere i cambiamenti
+          - Non si può pushare direttamente sul ramo `main`
+          - I rilasci sono tagliati dal ramo `main` e taggati per il versionamento
+
+          ----
+
+          I vantaggi di GithubFlow stanno nella sua semplicità e nell'essere integrato con le
+          moderne piattaforme di gestione del codice (Github, Gitlab, Azure Devops, etc...)
+          
+          ----
+
+          ![image](https://user-images.githubusercontent.com/6351798/139560548-772d637a-394f-4382-936c-319995e12d43.png)
+
+          ---
+
+          ## Trunk based development
+
+          Questo modello è uno dei più antichi (ha più di 30 anni) e nonostante questo ancora molto diffuso (lo usa Google per esempio).
+
+          [trunkbaseddevelopment.com](https://trunkbaseddevelopment.com/)
+
+          ----
+
+          - Tutto il codice viene committato in un unico branch (`trunk`, `master` o `main`) 
+          - Il ramo `trunk` deve essere sempre **production-ready**
+          - Lo sviluppo è fatto direttamente sul ramo `trunk`
+          - Il ramo `trunk` è condiviso da tutti gli sviluppatori
+
+          ----
+
+          - Non esistono long lived feature branches
+          - Sono permessi short lived feature branches per team allargati (Pull Requests)
+          - Prima di pushare il codice su `trunk` ci si aspetta che lo sviluppatore esegua un test completo del software sul suo PC
+          - **Dopo** il push su `trunk` opzionalmente si può indirre una code review dei cambiamenti
+
+          ----
+
+          ![image](https://trunkbaseddevelopment.com/trunk1b.png)
+
+          ---
+
+          ## Release flow
+
+          Release flow è una rivisitazione del Trunk based development.
+
+          Vi lascio qui il link per i curiosi: [releaseflow.org](http://releaseflow.org)
+
+          ---
+
+          ## JetBrains Space Git flow
+
+          Questo flusso è stato ideato da JetBrains per l'uso specifico della loro piattaforma **Space**.
+
+          [space-git-flow](https://blog.jetbrains.com/space/2023/04/18/space-git-flow/)
+
+          ----
+
+          - Il branch `main` per solo per il codice di produzione
+          - Lo sviluppo è fatto su short-lived feature branches da riportare su `main`
+          - Si fanno Merge/Pull request per fare code review e discutere i cambiamenti
+          - Per maggior sicurezza viene usato un metodo di "Safe Merging" introdotto da JetBrains
+          - I release branches sono creati a partire da `main`
+
+          ----
+
+          <img src="https://blog.jetbrains.com/wp-content/uploads/2023/04/jetbrains-space-git-flow-1.png" style="height:680px"/>
+
+          ---
+          # Q&A
+          
+          > ⸺  <cite>Daniele Simonetti © 2024</cite>  
+          </textarea>
+      </section>
+    </div>
+  </div>
+
+  <script src="plugin/highlight/highlight.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  
+  <script src="dist/reveal.js"></script>
+  <script>
+    Reveal.initialize({
+      plugins: [RevealMarkdown, RevealHighlight],
+      slideNumber: true,
+      progress: true,
+      jumpToSlide: true,
+      hash: true,
+      overview: true
+    });
+  </script>
+</body>
+
 </html>
