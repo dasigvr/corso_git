@@ -15,6 +15,7 @@
           <li><a href="#/core-concepts">Concetti di base</a></li>
           <li><a href="#/branching">Branching e Merging</a></li>
           <li><a href="#/flows">Flussi, Concetti avanzati</a></li>
+          <li><a href="#/subrepos">Multi-repo</a></li>
         </ul>
       </section>
       <section id="core-concepts" data-separator-vertical="----" data-markdown>
@@ -757,6 +758,133 @@
           
           > ⸺  <cite>Daniele Simonetti © 2024</cite>  
           </textarea>
+      </section>
+
+      <section id="subrepos" data-separator-vertical="----" data-markdown>
+        <textarea data-template>
+          # Multirepo
+          ---
+          ## Premessa
+
+          Non è scopo del corso analizzare pro e contro 
+          di soluzioni mono/multi repository.
+
+          Discuteremo degli strumenti che Git offre
+          per facilitare queste soluzioni.
+          ---
+          ## Monorepo by default
+
+          Git è evidentemente opinionato a favore del monorepo
+          dato che non offre soluzioni robuste per il multirepo,
+          ma allo stesso tempo ne esistono più di una.
+          ---
+          ## Git Submodules
+
+          `git submodule` è integrato in quasi tutte le distribuzioni di Git.
+
+          - Permette di gestire sotto-repository all'interno dello stesso working tree.
+          - Semplice per collaborare upstream
+          - Tiene separato i sotto-repo tra di loro
+          ----
+
+          `git submodule add https://path/to/mylibrary`
+
+          Aggiunge un sotto repository in una cartella `mylibrary`
+
+          ----
+
+          ![submodule working tree](https://www.augmentedmind.de/wp-content/uploads/2020/06/submodule-example.jpg)
+
+          ----
+
+          ![submodule commits](https://whatacold.io/img/2019-01-13-git-submodule-diagram.png)
+
+          ----          
+
+          Git tiene traccia dei sottomoduli in un file di metadati chiamato `.gitmodules`
+          Questo file va tracciato su Git.
+
+          ```
+          [submodule "mylibrary"]
+          path = mylibrary
+          url = https://path/to/mylibrary
+          ```
+          ----
+          ### Clonare non basta
+
+          Quando si clona un repository con dei submodules non si ottiene il loro codice.
+
+          ```
+          git submodule update --init --recursive
+          ```
+
+          ---
+
+          ## Git subtree
+
+          Git subtree è una alternativa a gitmodules anch'essa disponibile
+          senza utilizzo di tools esterni.
+
+          ---
+
+          - non ha bisogno di metadata aggiuntivi (niente .gitmodules)          
+          - il codice è disponibile fin da subito il clone
+          - è necessario imparare una nuova strategia di merge (subtree)
+          - responsabilità di non mischiare codice di super e sottoprogetti in un unico commit
+
+          ----
+
+          Si aggiunge il remote del sotto-progetto:
+
+          ```
+          git remote add -f SubTreeName https://github.com/user/project.git
+          ```
+
+          ----
+
+          Si scarica il codice in una sottocartella (`--squash` serve per non srotolare tutta la storia)
+
+          ```
+          git subtree add --prefix .Path/To/SubTree SubTreeName master --squash
+          ```
+
+          ----
+
+          Si può fare il fetch del nuovo codice normalmente:
+
+          ```
+          git fetch SubTreeName master
+          ```
+
+          Ma per applicare le modifiche (pull) è necessario usare il comando `subtree`:
+
+          ```
+          git subtree pull --prefix .Path/To/SubTree SubTreeName SubTreeName master --squash
+          ```
+
+          ----
+
+          Stessa cosa se vogliamo aggiornare il codice del subrepo upstream:
+
+          ```
+          git subtree push --prefix=.Path/To/SubTree SubTreeName master
+          ```
+
+          ---
+
+          ## Altre alternative
+
+          [Git subrepo](https://github.com/ingydotnet/git-subrepo)
+          [Google Repo](https://source.android.com/docs/setup/develop/repo)
+
+
+          ---
+          # Q&A
+          
+          > ⸺  <cite>Daniele Simonetti © 2024</cite>  
+
+
+        </textarea>
       </section>
     </div>
   </div>
